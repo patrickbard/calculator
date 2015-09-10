@@ -13,17 +13,19 @@ public class Main {
     private static List<String> simpleOperations = Arrays.asList("+", "-", "/", "*");
     private static List<String> trigonometricOperations = Arrays.asList("cos", "sin", "atan");
     private static List<String> stackOperations = Arrays.asList("pop", "dup", "swap");
-    private static File cases_folder = new File("test_cases/");
+    private static File[] testCases = new File("test_cases/").listFiles();
 
     public static void main(String[] args) throws IOException {
-        File[] files = cases_folder.listFiles();
-        Arrays.sort(files);
+        Arrays.sort(testCases);
+        Deque<Double> stack;
+        Scanner fileReader;
+        int largestStackSize;
 
-        for (File file : files) {
+        for (File file : testCases) {
             if (file.isFile()) {
-                Deque<Double> stack = new ArrayDeque<>();
-                Scanner fileReader = new Scanner(file);
-                int largestStackSize = 0;
+                stack = new ArrayDeque<>();
+                fileReader = new Scanner(file, "UTF-8");
+                largestStackSize = 0;
 
                 while (fileReader.hasNext()) {
                     if (fileReader.hasNextDouble()) {
@@ -68,13 +70,15 @@ public class Main {
                                     stack.pop();
                                     break;
                                 case "dup":
-                                    stack.push(stack.getLast());
+                                    stack.push(stack.getFirst());
                                     break;
                                 case "swap":
-                                    x = stack.pop();
-                                    y = stack.pop();
-                                    stack.push(x);
-                                    stack.push(y);
+                                    if (stack.size() >= 2) {
+                                        x = stack.pop();
+                                        y = stack.pop();
+                                        stack.push(x);
+                                        stack.push(y);
+                                    } else System.exit(0);
                                     break;
                             }
                         } else System.exit(0);
@@ -84,7 +88,7 @@ public class Main {
                 System.out.println("----------------- " + file.getName() + " -----------------");
                 System.out.printf("%22s %7s%n", "Largest size reached:", largestStackSize);
                 System.out.printf("%22s %7s%n", "Stack size at the end:", stack.size());
-                System.out.printf("%22s %15.7f%n", "Value on top:", stack.pop());
+                System.out.printf("%22s %15.7f%n", "Value on top:", (!stack.isEmpty()) ? stack.getFirst() : null);
             }
         }
     }
